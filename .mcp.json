@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "serena": {
+      "command": "/home/guilherme/.local/bin/uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "--project",
+        "/home/guilherme/code/desafio_blue_otter",
+        "--transport",
+        "stdio"
+      ],
+      "env": {
+        "PATH": "${PATH}"
+      }
+    }
+  }
+}

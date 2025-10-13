@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            Int          @id @default(autoincrement())
+  githubId      Int          @unique @map("github_id")
+  login         String       @unique
+  avatarUrl     String?      @map("avatar_url")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  repositories  Repository[]
+
+  @@map("users")
+  @@index([login])
+  @@index([githubId])
+}
+
+model Repository {
+  id            Int       @id @default(autoincrement())
+  githubId      Int       @unique @map("github_id")
+  name          String
+  description   String?
+  url           String
+  language      String?
+  createdAt     DateTime  @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  userId        Int       @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("repositories")
+  @@index([userId])
+  @@index([name])
+  @@index([language])
+  @@index([createdAt])
+  @@index([githubId])
+}
+
+model Log {
+  id            String    @id @default(uuid())
+  timestamp     DateTime  @default(now())
+  level         LogLevel
+  message       String
+  context       Json?
+  stackTrace    String?   @map("stack_trace")
+  metadata      Json?
+
+  @@map("logs")
+  @@index([timestamp])
+  @@index([level])
+}
+
+enum LogLevel {
+  DEBUG
+  INFO
+  WARN
+  ERROR
+}

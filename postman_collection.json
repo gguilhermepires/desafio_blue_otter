@@ -1,0 +1,178 @@
+{
+  "info": {
+    "name": "GitHub Repository Management API",
+    "description": "REST API for synchronizing, listing, searching, and analyzing GitHub repositories. This API provides endpoints to sync GitHub user repositories to a local database, perform advanced searches, and generate statistical insights.",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Get Health Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            },
+            "description": "Health check endpoint to verify the API is running."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Repositories",
+      "item": [
+        {
+          "name": "Sync User Repositories",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/repositories/sync/:username",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "repositories", "sync", ":username"],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "octocat",
+                  "description": "GitHub username"
+                }
+              ]
+            },
+            "description": "Fetches and stores all public repositories for a GitHub user. Creates or updates user and repository records.\n\n**Responses:**\n- 201: Repositories synced successfully\n- 404: GitHub user not found\n- 429: GitHub API rate limit exceeded\n- 502: GitHub API request failed"
+          },
+          "response": []
+        },
+        {
+          "name": "List User Repositories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/repositories/list/:username?page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "repositories", "list", ":username"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of items per page (default: 20)"
+                }
+              ],
+              "variable": [
+                {
+                  "key": "username",
+                  "value": "octocat",
+                  "description": "GitHub username"
+                }
+              ]
+            },
+            "description": "Returns paginated list of repositories for a user, ordered by creation date (newest first).\n\n**Responses:**\n- 200: Repositories retrieved successfully\n- 404: User not found in database"
+          },
+          "response": []
+        },
+        {
+          "name": "Search Repositories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/repositories/search?q=react typescript&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "repositories", "search"],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "react typescript",
+                  "description": "Search keywords (space-separated). Searches in name, description, and language fields with OR logic."
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number (default: 1)"
+                },
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of items per page (default: 20)"
+                }
+              ]
+            },
+            "description": "Searches repositories by keywords in name, description, and language fields. Supports multiple space-separated keywords with OR logic.\n\n**Responses:**\n- 200: Search results retrieved successfully\n- 400: Invalid search query"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Statistics",
+      "item": [
+        {
+          "name": "Get Global Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/statistics?topN=5",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statistics"],
+              "query": [
+                {
+                  "key": "topN",
+                  "value": "5",
+                  "description": "Number of top users to return (only for global statistics, default: 5)"
+                }
+              ]
+            },
+            "description": "Calculate and return global statistics about all repositories. Includes summary counts, language distribution, timeline, and top users.\n\n**Responses:**\n- 200: Statistics calculated successfully\n- 400: Invalid query parameters"
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/statistics?user=octocat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "statistics"],
+              "query": [
+                {
+                  "key": "user",
+                  "value": "octocat",
+                  "description": "Filter statistics by GitHub username"
+                }
+              ]
+            },
+            "description": "Calculate and return statistics filtered by a specific user. Includes summary counts, language distribution, and timeline for that user's repositories.\n\n**Responses:**\n- 200: Statistics calculated successfully\n- 400: Invalid query parameters"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
