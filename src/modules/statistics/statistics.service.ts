@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter, Histogram } from 'prom-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { StatisticsDto } from './dto/statistics.dto';
 import {
@@ -10,7 +12,13 @@ import {
 export class StatisticsService {
   private readonly logger = new Logger(StatisticsService.name);
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @InjectMetric('statistics_calculations_total')
+    private readonly statsCounter: Counter<string>,
+    @InjectMetric('statistics_calculation_duration_seconds')
+    private readonly statsDuration: Histogram<string>,
+  ) {}
 
   /**
    * Generate statistics for repositories
@@ -18,6 +26,7 @@ export class StatisticsService {
   async generateStatistics(
     statsDto: StatisticsDto,
   ): Promise<StatisticsResponseDto> {
+    const startTime = Date.now();
     const { user, topN = 5 } = statsDto;
 
     // Build filter based on user parameter
@@ -68,6 +77,11 @@ export class StatisticsService {
     if (!user && topUsers) {
       response.top_users_by_repos = topUsers;
     }
+
+    // Record metrics
+    const duration = (Date.now() - startTime) / 1000;
+    this.statsCounter.inc({ username: user || 'global' });
+    this.statsDuration.observe({ username: user || 'global' }, duration);
 
     return response;
   }

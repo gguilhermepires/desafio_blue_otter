@@ -7,6 +7,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter, Histogram } from 'prom-client';
 import { firstValueFrom } from 'rxjs';
 import { AxiosError, AxiosResponse } from 'axios';
 import { GitHubUser } from './interfaces/github-user.interface';
@@ -19,7 +21,13 @@ export class GithubService {
   private readonly timeout = 10000; // 10 seconds
   private readonly maxRetries = 3;
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @InjectMetric('github_api_requests_total')
+    private readonly githubApiCounter: Counter<string>,
+    @InjectMetric('github_api_request_duration_seconds')
+    private readonly githubApiDuration: Histogram<string>,
+  ) {}
 
   /**
    * Fetch user data from GitHub API
@@ -45,6 +53,9 @@ export class GithubService {
     url: string,
     retries = this.maxRetries,
   ): Promise<T> {
+    const startTime = Date.now();
+    const endpoint = url.replace(this.baseUrl, '').split('?')[0];
+
     for (let attempt = 0; attempt < retries; attempt++) {
       try {
         const response = await firstValueFrom(
@@ -60,17 +71,29 @@ export class GithubService {
         // Check rate limit
         this.checkRateLimit(response);
 
+        // Record successful request metrics
+        const duration = (Date.now() - startTime) / 1000;
+        this.githubApiCounter.inc({ endpoint, status: 'success' });
+        this.githubApiDuration.observe({ endpoint }, duration);
+
         return response.data;
       } catch (error) {
         const axiosError = error as AxiosError;
 
         // Handle 404 Not Found
         if (axiosError.response?.status === 404) {
+          const duration = (Date.now() - startTime) / 1000;
+          this.githubApiCounter.inc({ endpoint, status: '404' });
+          this.githubApiDuration.observe({ endpoint }, duration);
           throw new NotFoundException('GitHub user not found');
         }
 
         // Handle 429 Rate Limit
         if (axiosError.response?.status === 429) {
+          const duration = (Date.now() - startTime) / 1000;
+          this.githubApiCounter.inc({ endpoint, status: '429' });
+          this.githubApiDuration.observe({ endpoint }, duration);
+
           const resetTime = axiosError.response.headers['x-ratelimit-reset'];
           const waitTime = resetTime
             ? parseInt(resetTime) * 1000 - Date.now()
@@ -101,6 +124,10 @@ export class GithubService {
         }
 
         // All retries exhausted
+        const duration = (Date.now() - startTime) / 1000;
+        this.githubApiCounter.inc({ endpoint, status: 'failure' });
+        this.githubApiDuration.observe({ endpoint }, duration);
+
         this.logger.error(
           `GitHub API request failed after ${retries} attempts: ${axiosError.message}`,
         );

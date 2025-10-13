@@ -1,4 +1,6 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter, Histogram, Gauge } from 'prom-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { GithubService } from '../github/github.service';
 import { UsersService } from '../users/users.service';
@@ -17,61 +19,88 @@ export class RepositoriesService {
     private readonly prisma: PrismaService,
     private readonly githubService: GithubService,
     private readonly usersService: UsersService,
+    @InjectMetric('repository_sync_total')
+    private readonly syncCounter: Counter<string>,
+    @InjectMetric('repository_sync_duration_seconds')
+    private readonly syncDuration: Histogram<string>,
+    @InjectMetric('repositories_synced')
+    private readonly reposSyncedGauge: Gauge<string>,
+    @InjectMetric('repository_searches_total')
+    private readonly searchCounter: Counter<string>,
+    @InjectMetric('repository_search_duration_seconds')
+    private readonly searchDuration: Histogram<string>,
+    @InjectMetric('repository_search_results')
+    private readonly searchResultsGauge: Gauge<string>,
   ) {}
 
   /**
    * Synchronize GitHub repositories for a user
    */
   async syncUserRepositories(username: string): Promise<SyncResponseDto> {
+    const startTime = Date.now();
     const timestamp = new Date();
 
-    // Fetch user data from GitHub
-    const githubUser = await this.githubService.fetchUserData(username);
+    try {
+      // Fetch user data from GitHub
+      const githubUser = await this.githubService.fetchUserData(username);
 
-    // Upsert user in database
-    const user = await this.usersService.upsertUser(githubUser);
+      // Upsert user in database
+      const user = await this.usersService.upsertUser(githubUser);
 
-    // Fetch repositories from GitHub
-    const githubRepos =
-      await this.githubService.fetchUserRepositories(username);
+      // Fetch repositories from GitHub
+      const githubRepos =
+        await this.githubService.fetchUserRepositories(username);
 
-    // Upsert repositories in parallel
-    await Promise.all(
-      githubRepos.map((repo) =>
-        this.prisma.repository.upsert({
-          where: {
-            githubId: repo.id,
-          },
-          update: {
-            name: repo.name,
-            description: repo.description,
-            url: repo.html_url,
-            language: repo.language,
-            createdAt: new Date(repo.created_at),
-            updatedAt: new Date(),
-          },
-          create: {
-            githubId: repo.id,
-            name: repo.name,
-            description: repo.description,
-            url: repo.html_url,
-            language: repo.language,
-            createdAt: new Date(repo.created_at),
-            userId: user.id,
-          },
-        }),
-      ),
-    );
+      // Upsert repositories in parallel
+      await Promise.all(
+        githubRepos.map((repo) =>
+          this.prisma.repository.upsert({
+            where: {
+              githubId: repo.id,
+            },
+            update: {
+              name: repo.name,
+              description: repo.description,
+              url: repo.html_url,
+              language: repo.language,
+              createdAt: new Date(repo.created_at),
+              updatedAt: new Date(),
+            },
+            create: {
+              githubId: repo.id,
+              name: repo.name,
+              description: repo.description,
+              url: repo.html_url,
+              language: repo.language,
+              createdAt: new Date(repo.created_at),
+              userId: user.id,
+            },
+          }),
+        ),
+      );
 
-    this.logger.log(
-      `Synchronized ${githubRepos.length} repositories for user ${username}`,
-    );
+      // Record metrics
+      const duration = (Date.now() - startTime) / 1000;
+      this.syncCounter.inc({ username, status: 'success' });
+      this.syncDuration.observe({ username }, duration);
+      this.reposSyncedGauge.set({ username }, githubRepos.length);
 
-    return {
-      count: githubRepos.length,
-      timestamp,
-      username,
-    };
+      this.logger.log(
+        `Synchronized ${githubRepos.length} repositories for user ${username}`,
+      );
+
+      return {
+        count: githubRepos.length,
+        timestamp,
+        username,
+      };
+    } catch (error) {
+      // Record failure metric
+      const duration = (Date.now() - startTime) / 1000;
+      this.syncCounter.inc({ username, status: 'failure' });
+      this.syncDuration.observe({ username }, duration);
+      throw error;
+    }
   }
 
   /**
@@ -120,6 +149,7 @@ export class RepositoriesService {
    * Search repositories by keywords with pagination and relevance ordering
    */
   async searchRepositories(searchDto: SearchDto): Promise<SearchResponseDto> {
+    const startTime = Date.now();
     const page = searchDto.page || 1;
     const limit = searchDto.limit || 20;
     const skip = (page - 1) * limit;
@@ -150,6 +180,16 @@ export class RepositoriesService {
         },
       }),
     ]);
+
+    // Record metrics
+    const duration = (Date.now() - startTime) / 1000;
+    this.searchCounter.inc({
+      has_query: 'true',
+      has_language: 'false',
+      has_description: 'false',
+    });
+    this.searchDuration.observe({ has_filters: 'true' }, duration);
+    this.searchResultsGauge.set(total);
 
     return {
       data: repositories,

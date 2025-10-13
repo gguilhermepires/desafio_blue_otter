@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR, APP_GUARD } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './modules/prisma/prisma.module';
@@ -11,8 +12,11 @@ import { UsersModule } from './modules/users/users.module';
 import { RepositoriesModule } from './modules/repositories/repositories.module';
 import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LoggerModule } from './modules/logger/logger.module';
+import { HealthModule } from './modules/health/health.module';
+import { MetricsModule } from './modules/metrics/metrics.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
 import { validate } from './config/env.validation';
 
 @Module({
@@ -31,7 +35,16 @@ import { validate } from './config/env.validation';
         limit: 100, // 100 requests
       },
     ]),
+    // Prometheus metrics
+    PrometheusModule.register({
+      path: '/metrics',
+      defaultMetrics: {
+        enabled: true,
+      },
+    }),
     LoggerModule,
+    HealthModule,
+    MetricsModule,
     PrismaModule,
     GithubModule,
     UsersModule,
@@ -50,6 +63,11 @@ import { validate } from './config/env.validation';
     {
       provide: APP_INTERCEPTOR,
       useClass: LoggingInterceptor,
+    },
+    // Global metrics interceptor
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MetricsInterceptor,
     },
     // Global rate limiting guard
     {

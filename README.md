@@ -10,6 +10,7 @@ A RESTful API built with NestJS for synchronizing, managing, and analyzing GitHu
 - 📊 **Statistics** - Generate insights including language distribution, timeline, and top users
 - 🔒 **Security** - Rate limiting, CORS configuration, Helmet middleware, input validation
 - 📝 **Logging** - Async database logging with 30-day retention and correlation IDs
+- 📈 **Monitoring** - Prometheus metrics & Grafana dashboards for observability
 - 🐳 **Docker Ready** - Full Docker Compose setup with PostgreSQL
 - 📖 **API Documentation** - Interactive Swagger/OpenAPI documentation
 - ✅ **Well Tested** - 73% test coverage with unit, integration, and E2E tests
@@ -21,6 +22,7 @@ A RESTful API built with NestJS for synchronizing, managing, and analyzing GitHu
 - **Framework:** [NestJS](https://nestjs.com/)
 - **Database:** PostgreSQL 16
 - **ORM:** [Prisma](https://www.prisma.io/)
+- **Monitoring:** Prometheus + Grafana
 - **Containers:** Docker + Docker Compose
 - **Documentation:** Swagger/OpenAPI + VitePress
 - **Testing:** Jest + Supertest
@@ -68,6 +70,10 @@ LOG_RETENTION_DAYS=30
 # Rate Limiting
 THROTTLE_TTL=60
 THROTTLE_LIMIT=100
+
+# Monitoring - Grafana
+GRAFANA_ADMIN_USER=admin
+GRAFANA_ADMIN_PASSWORD=admin
 ```
 
 ### 3. Run with Docker Compose (Recommended)
@@ -81,6 +87,9 @@ docker-compose up -d
 This will:
 - Start a PostgreSQL 16 container on port 5432
 - Start the NestJS API container on port 3000
+- Start Prometheus on port 9090 for metrics collection
+- Start Grafana on port 3001 for visualization dashboards
+- Start monitoring exporters (postgres_exporter, node_exporter)
 - Automatically run Prisma migrations
 - Set up health checks and volume persistence
 
@@ -221,6 +230,124 @@ The Swagger UI provides:
 - Request/response schemas
 - Try-it-out functionality
 - Example requests and responses
+
+## Monitoring & Observability
+
+The application includes a comprehensive monitoring stack with Prometheus and Grafana for real-time observability.
+
+### Access Monitoring Tools
+
+After starting with `docker-compose up -d`, access:
+
+- **Grafana Dashboards:** http://localhost:3001
+  - Default credentials: `admin` / `admin` (change in `.env`)
+  - Pre-configured dashboards are automatically provisioned
+
+- **Prometheus Metrics:** http://localhost:9090
+  - Raw metrics and query interface
+  - Scrapes metrics every 15 seconds
+
+- **Application Metrics:** http://localhost:3000/metrics
+  - Prometheus-formatted metrics endpoint
+
+### Available Dashboards
+
+#### 1. API Overview Dashboard
+Monitor HTTP request metrics and API performance:
+- **Request Rate** - Requests per second by endpoint and status code
+- **Response Latency** - p50, p95, p99 percentiles for all endpoints
+- **Status Codes** - 2xx success, 4xx client errors, 5xx server errors
+- **Error Rate** - Percentage of 5xx errors
+
+#### 2. Business Metrics Dashboard
+Track application-specific business operations:
+- **Repository Sync Operations** - Success/failure rates and duration
+- **Repositories Synced** - Latest sync counts by user
+- **Search Performance** - Search rates, results, and duration
+- **Statistics Calculations** - Calculation rates and performance
+- **GitHub API Requests** - External API call tracking
+
+### Metrics Collected
+
+The application automatically collects and exports the following metrics:
+
+**HTTP Metrics:**
+- `http_requests_total` - Counter of all HTTP requests (by method, route, status)
+- `http_request_duration_seconds` - Histogram of request durations
+
+**Repository Operations:**
+- `repository_sync_total` - Counter of sync operations (by username, status)
+- `repository_sync_duration_seconds` - Histogram of sync durations
+- `repositories_synced` - Gauge of repositories synced per user
+- `repository_searches_total` - Counter of search operations
+- `repository_search_duration_seconds` - Histogram of search durations
+- `repository_search_results` - Gauge of search result counts
+
+**GitHub API:**
+- `github_api_requests_total` - Counter of GitHub API calls (by endpoint, status)
+- `github_api_request_duration_seconds` - Histogram of GitHub API call durations
+
+**Statistics:**
+- `statistics_calculations_total` - Counter of statistics calculations
+- `statistics_calculation_duration_seconds` - Histogram of calculation durations
+
+**Database Metrics (via postgres_exporter):**
+- Active connections
+- Query performance
+- Transaction rates
+- Cache hit ratios
+
+**System Metrics (via node_exporter):**
+- CPU usage
+- Memory usage
+- Disk I/O
+- Network traffic
+
+### Health Checks
+
+The application provides health check endpoints for monitoring:
+
+```bash
+# Overall health check
+curl http://localhost:3000/health
+
+# Liveness probe (is the app running?)
+curl http://localhost:3000/health/live
+
+# Readiness probe (is the app ready to serve traffic?)
+curl http://localhost:3000/health/ready
+```
+
+Health checks monitor:
+- Database connectivity
+- Memory usage (heap and RSS)
+- Disk storage availability
+
+### Data Retention
+
+- **Prometheus:** Metrics retained for 30 days (configurable in `docker-compose.yml`)
+- **Grafana:** Dashboard configurations persisted in Docker volumes
+
+### Customizing Dashboards
+
+You can modify existing dashboards or create new ones:
+
+1. **Via Grafana UI:**
+   - Edit dashboards directly in the Grafana interface
+   - Save changes to persist them in the database
+
+2. **Via JSON:**
+   - Export dashboards as JSON from Grafana
+   - Save to `grafana/dashboards/` directory
+   - Restart Grafana to auto-provision: `docker-compose restart grafana`
+
+### Monitoring Best Practices
+
+- **Set up alerts** in Grafana for critical metrics (high error rates, slow response times)
+- **Monitor trends** over time to identify performance degradation
+- **Review dashboards** regularly during development and after deployments
+- **Use labels** effectively to filter metrics by user, endpoint, or status
+- **Correlate metrics** with logs for faster troubleshooting
 
 ## Development
 
