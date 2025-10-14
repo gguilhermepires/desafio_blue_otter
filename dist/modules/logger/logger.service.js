@@ -38,7 +38,8 @@ let LoggerService = class LoggerService {
     }
     debug(message, context) {
         this.addToQueue(client_1.LogLevel.DEBUG, message, context);
-        if (process.env.NODE_ENV === 'development' || process.env.LOG_LEVEL === 'debug') {
+        if (process.env.NODE_ENV === 'development' ||
+            process.env.LOG_LEVEL === 'debug') {
             console.debug(`[DEBUG] ${message}`, context ? JSON.stringify(context) : '');
         }
     }

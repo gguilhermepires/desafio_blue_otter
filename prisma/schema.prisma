@@ -60,9 +60,33 @@ model Log {
   @@index([level])
 }
 
+model SyncJob {
+  id            Int           @id @default(autoincrement())
+  jobId         String        @unique @map("job_id")
+  username      String
+  status        SyncJobStatus @default(QUEUED)
+  repositoriesCount Int?      @map("repositories_count")
+  error         String?
+  createdAt     DateTime      @default(now()) @map("created_at")
+  completedAt   DateTime?     @map("completed_at")
+
+  @@map("sync_jobs")
+  @@index([jobId])
+  @@index([username])
+  @@index([status])
+  @@index([createdAt])
+}
+
 enum LogLevel {
   DEBUG
   INFO
   WARN
   ERROR
+}
+
+enum SyncJobStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
 }

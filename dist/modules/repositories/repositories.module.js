@@ -13,12 +13,20 @@ const repositories_service_1 = require("./repositories.service");
 const prisma_module_1 = require("../prisma/prisma.module");
 const github_module_1 = require("../github/github.module");
 const users_module_1 = require("../users/users.module");
+const metrics_module_1 = require("../metrics/metrics.module");
+const kafka_module_1 = require("../kafka/kafka.module");
 let RepositoriesModule = class RepositoriesModule {
 };
 exports.RepositoriesModule = RepositoriesModule;
 exports.RepositoriesModule = RepositoriesModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, github_module_1.GithubModule, users_module_1.UsersModule],
+        imports: [
+            prisma_module_1.PrismaModule,
+            github_module_1.GithubModule,
+            users_module_1.UsersModule,
+            metrics_module_1.MetricsModule,
+            (0, common_1.forwardRef)(() => kafka_module_1.KafkaModule),
+        ],
         controllers: [repositories_controller_1.RepositoriesController],
         providers: [repositories_service_1.RepositoriesService],
         exports: [repositories_service_1.RepositoriesService],

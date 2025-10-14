@@ -10,12 +10,13 @@ exports.GithubModule = void 0;
 const common_1 = require("@nestjs/common");
 const axios_1 = require("@nestjs/axios");
 const github_service_1 = require("./github.service");
+const metrics_module_1 = require("../metrics/metrics.module");
 let GithubModule = class GithubModule {
 };
 exports.GithubModule = GithubModule;
 exports.GithubModule = GithubModule = __decorate([
     (0, common_1.Module)({
-        imports: [axios_1.HttpModule],
+        imports: [axios_1.HttpModule, metrics_module_1.MetricsModule],
         providers: [github_service_1.GithubService],
         exports: [github_service_1.GithubService],
     })

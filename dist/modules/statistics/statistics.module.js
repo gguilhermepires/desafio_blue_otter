@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const statistics_controller_1 = require("./statistics.controller");
 const statistics_service_1 = require("./statistics.service");
 const prisma_module_1 = require("../prisma/prisma.module");
+const metrics_module_1 = require("../metrics/metrics.module");
 let StatisticsModule = class StatisticsModule {
 };
 exports.StatisticsModule = StatisticsModule;
 exports.StatisticsModule = StatisticsModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule],
+        imports: [prisma_module_1.PrismaModule, metrics_module_1.MetricsModule],
         controllers: [statistics_controller_1.StatisticsController],
         providers: [statistics_service_1.StatisticsService],
         exports: [statistics_service_1.StatisticsService],

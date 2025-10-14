@@ -1,12 +1,35 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { LoggerService } from './modules/logger/logger.service';
 import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Get ConfigService to read environment variables
+  const configService = app.get(ConfigService);
+  const kafkaBroker = configService.get<string>('KAFKA_BROKER', 'kafka:9092');
+
+  // Connect Kafka microservice
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.KAFKA,
+    options: {
+      client: {
+        clientId: 'github-api',
+        brokers: [kafkaBroker],
+      },
+      consumer: {
+        groupId: 'github-api-consumer',
+        allowAutoTopicCreation: true,
+      },
+    },
+  });
+
+  await app.startAllMicroservices();
 
   // Get logger service for startup logging
   const logger = app.get(LoggerService);
@@ -68,12 +91,16 @@ async function bootstrap() {
     nodeVersion: process.version,
     environment: process.env.NODE_ENV || 'development',
     corsOrigins,
+    kafkaBroker,
     timestamp: new Date().toISOString(),
   });
 
   console.log(`Application is running on: http://localhost:${port}`);
   console.log(
     `Swagger documentation available at: http://localhost:${port}/api/docs`,
+  );
+  console.log(
+    `Kafka broker connected at: ${kafkaBroker}`,
   );
 }
 bootstrap();

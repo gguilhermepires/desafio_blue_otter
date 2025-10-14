@@ -12,6 +12,7 @@ const config_1 = require("@nestjs/config");
 const core_1 = require("@nestjs/core");
 const schedule_1 = require("@nestjs/schedule");
 const throttler_1 = require("@nestjs/throttler");
+const nestjs_prometheus_1 = require("@willsoto/nestjs-prometheus");
 const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const prisma_module_1 = require("./modules/prisma/prisma.module");
@@ -20,8 +21,12 @@ const users_module_1 = require("./modules/users/users.module");
 const repositories_module_1 = require("./modules/repositories/repositories.module");
 const statistics_module_1 = require("./modules/statistics/statistics.module");
 const logger_module_1 = require("./modules/logger/logger.module");
+const health_module_1 = require("./modules/health/health.module");
+const metrics_module_1 = require("./modules/metrics/metrics.module");
+const kafka_module_1 = require("./modules/kafka/kafka.module");
 const all_exceptions_filter_1 = require("./common/filters/all-exceptions.filter");
 const logging_interceptor_1 = require("./common/interceptors/logging.interceptor");
+const metrics_interceptor_1 = require("./common/interceptors/metrics.interceptor");
 const env_validation_1 = require("./config/env.validation");
 let AppModule = class AppModule {
 };
@@ -41,7 +46,16 @@ exports.AppModule = AppModule = __decorate([
                     limit: 100,
                 },
             ]),
+            nestjs_prometheus_1.PrometheusModule.register({
+                path: '/metrics',
+                defaultMetrics: {
+                    enabled: true,
+                },
+            }),
             logger_module_1.LoggerModule,
+            health_module_1.HealthModule,
+            metrics_module_1.MetricsModule,
+            kafka_module_1.KafkaModule,
             prisma_module_1.PrismaModule,
             github_module_1.GithubModule,
             users_module_1.UsersModule,
@@ -58,6 +72,10 @@ exports.AppModule = AppModule = __decorate([
             {
                 provide: core_1.APP_INTERCEPTOR,
                 useClass: logging_interceptor_1.LoggingInterceptor,
+            },
+            {
+                provide: core_1.APP_INTERCEPTOR,
+                useClass: metrics_interceptor_1.MetricsInterceptor,
             },
             {
                 provide: core_1.APP_GUARD,

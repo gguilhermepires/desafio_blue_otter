@@ -14,6 +14,7 @@ import { StatisticsModule } from './modules/statistics/statistics.module';
 import { LoggerModule } from './modules/logger/logger.module';
 import { HealthModule } from './modules/health/health.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
+import { KafkaModule } from './modules/kafka/kafka.module';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { MetricsInterceptor } from './common/interceptors/metrics.interceptor';
@@ -45,6 +46,7 @@ import { validate } from './config/env.validation';
     LoggerModule,
     HealthModule,
     MetricsModule,
+    KafkaModule,
     PrismaModule,
     GithubModule,
     UsersModule,
