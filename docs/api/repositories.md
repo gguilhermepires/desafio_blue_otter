@@ -27,7 +27,7 @@ POST /sync/:username
 
 **Example Request:**
 ```bash
-curl -X POST http://localhost:3000/api/repositories/sync/octocat
+curl -X POST http://138.197.49.129/api/repositories/sync/octocat
 ```
 
 **Success Response (201):**
@@ -80,7 +80,7 @@ GET /list/:username
 
 **Example Request:**
 ```bash
-curl "http://localhost:3000/api/repositories/list/octocat?page=1&limit=10"
+curl "http://138.197.49.129/api/repositories/list/octocat?page=1&limit=10"
 ```
 
 **Success Response (200):**
@@ -178,22 +178,22 @@ GET /search
 
 Simple search:
 ```bash
-curl "http://localhost:3000/api/repositories/search?q=typescript"
+curl "http://138.197.49.129/api/repositories/search?q=typescript"
 ```
 
 Multiple keywords:
 ```bash
-curl "http://localhost:3000/api/repositories/search?q=typescript+react"
+curl "http://138.197.49.129/api/repositories/search?q=typescript+react"
 ```
 
 Filter by user:
 ```bash
-curl "http://localhost:3000/api/repositories/search?q=api&user=octocat"
+curl "http://138.197.49.129/api/repositories/search?q=api&user=octocat"
 ```
 
 With pagination:
 ```bash
-curl "http://localhost:3000/api/repositories/search?q=javascript&page=2&limit=10"
+curl "http://138.197.49.129/api/repositories/search?q=javascript&page=2&limit=10"
 ```
 
 **Success Response (200):**
@@ -291,31 +291,31 @@ X-RateLimit-Reset: 1641902400
 ### Initial Sync
 ```bash
 # Sync user's repositories
-curl -X POST http://localhost:3000/api/repositories/sync/octocat
+curl -X POST http://138.197.49.129/api/repositories/sync/octocat
 
 # List synced repositories
-curl http://localhost:3000/api/repositories/list/octocat
+curl http://138.197.49.129/api/repositories/list/octocat
 ```
 
 ### Search and Filter
 ```bash
 # Find TypeScript projects
-curl "http://localhost:3000/api/repositories/search?q=typescript"
+curl "http://138.197.49.129/api/repositories/search?q=typescript"
 
 # Find React + TypeScript projects
-curl "http://localhost:3000/api/repositories/search?q=react+typescript"
+curl "http://138.197.49.129/api/repositories/search?q=react+typescript"
 
 # Search within specific user
-curl "http://localhost:3000/api/repositories/search?q=api&user=octocat"
+curl "http://138.197.49.129/api/repositories/search?q=api&user=octocat"
 ```
 
 ### Pagination
 ```bash
 # Get page 2 with 50 items
-curl "http://localhost:3000/api/repositories/list/octocat?page=2&limit=50"
+curl "http://138.197.49.129/api/repositories/list/octocat?page=2&limit=50"
 
 # Search with custom page size
-curl "http://localhost:3000/api/repositories/search?q=python&page=1&limit=100"
+curl "http://138.197.49.129/api/repositories/search?q=python&page=1&limit=100"
 ```
 
 ## Next Steps

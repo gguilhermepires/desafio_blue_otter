@@ -107,7 +107,7 @@ NODE_ENV=production
 
 Comma-separated list of allowed origins for CORS.
 
-**Default:** `http://localhost:3000,http://localhost:5173,http://localhost:8080`
+**Default:** `http://138.197.49.129,http://localhost:5173,http://localhost:8080`
 
 **Example:**
 ```env
@@ -116,7 +116,7 @@ CORS_ORIGINS="https://app.example.com,https://dashboard.example.com"
 
 **Local Development:**
 ```env
-CORS_ORIGINS="http://localhost:3000,http://localhost:5173"
+CORS_ORIGINS="http://138.197.49.129,http://localhost:5173"
 ```
 
 **Production:**
@@ -274,7 +274,7 @@ PORT=3000
 NODE_ENV=development
 
 # CORS
-CORS_ORIGINS="http://localhost:3000,http://localhost:5173,http://localhost:8080"
+CORS_ORIGINS="http://138.197.49.129,http://localhost:5173,http://localhost:8080"
 
 # Logging
 LOG_LEVEL=debug

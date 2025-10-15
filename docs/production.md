@@ -134,7 +134,7 @@ docker-compose logs -f
 
 ```bash
 # Test API endpoint
-curl http://localhost:3000/api/docs
+curl http://138.197.49.129/api/docs
 
 # Check health
 docker-compose ps
@@ -182,7 +182,7 @@ server {
 
     # Proxy to application
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://138.197.49.129;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';
@@ -543,7 +543,7 @@ gunzip -c /opt/backups/github-api/backup_<timestamp>.sql.gz | \
 docker-compose up -d
 
 # 5. Verify
-curl http://localhost:3000/api/docs
+curl http://138.197.49.129/api/docs
 ```
 
 ## Troubleshooting

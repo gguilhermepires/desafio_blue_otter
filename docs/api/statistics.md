@@ -30,12 +30,12 @@ GET /
 
 All repositories:
 ```bash
-curl "http://localhost:3000/api/statistics?topN=10"
+curl "http://138.197.49.129/api/statistics?topN=10"
 ```
 
 Specific user:
 ```bash
-curl "http://localhost:3000/api/statistics?user=octocat&topN=5"
+curl "http://138.197.49.129/api/statistics?user=octocat&topN=5"
 ```
 
 **Success Response (200):**
@@ -233,7 +233,7 @@ User not found or no repositories:
 Get comprehensive statistics across all synchronized repositories:
 
 ```bash
-curl "http://localhost:3000/api/statistics"
+curl "http://138.197.49.129/api/statistics"
 ```
 
 **Use for:**
@@ -246,7 +246,7 @@ curl "http://localhost:3000/api/statistics"
 Analyze a specific user's repository portfolio:
 
 ```bash
-curl "http://localhost:3000/api/statistics?user=octocat"
+curl "http://138.197.49.129/api/statistics?user=octocat"
 ```
 
 **Use for:**
@@ -260,10 +260,10 @@ Get different sized rankings:
 
 ```bash
 # Top 5
-curl "http://localhost:3000/api/statistics?topN=5"
+curl "http://138.197.49.129/api/statistics?topN=5"
 
 # Top 50
-curl "http://localhost:3000/api/statistics?topN=50"
+curl "http://138.197.49.129/api/statistics?topN=50"
 ```
 
 **Use for:**
@@ -328,7 +328,7 @@ async function getStatistics(user?: string, topN: number = 10) {
   params.append('topN', String(topN));
 
   const response = await fetch(
-    `http://localhost:3000/api/statistics?${params}`
+    `http://138.197.49.129/api/statistics?${params}`
   );
 
   if (!response.ok) {
@@ -354,7 +354,7 @@ def get_statistics(user=None, top_n=10):
         params['user'] = user
 
     response = requests.get(
-        'http://localhost:3000/api/statistics',
+        'http://138.197.49.129/api/statistics',
         params=params
     )
     response.raise_for_status()
@@ -369,13 +369,13 @@ print(f"Total repositories: {stats['totalRepositories']}")
 
 ```bash
 # Save to file
-curl "http://localhost:3000/api/statistics" > stats.json
+curl "http://138.197.49.129/api/statistics" > stats.json
 
 # Pretty print
-curl "http://localhost:3000/api/statistics" | jq .
+curl "http://138.197.49.129/api/statistics" | jq .
 
 # Extract specific fields
-curl -s "http://localhost:3000/api/statistics" | \
+curl -s "http://138.197.49.129/api/statistics" | \
   jq '.languageDistribution[] | select(.language == "TypeScript")'
 ```
 

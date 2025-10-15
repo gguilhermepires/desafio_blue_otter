@@ -54,16 +54,16 @@ features:
 
 ```bash
 # Sync repositories for a GitHub user
-curl -X POST http://localhost:3000/api/repositories/sync/octocat
+curl -X POST http://138.197.49.129/api/repositories/sync/octocat
 
 # List repositories with pagination
-curl http://localhost:3000/api/repositories/list/octocat?page=1&limit=10
+curl http://138.197.49.129/api/repositories/list/octocat?page=1&limit=10
 
 # Search repositories by keywords
-curl "http://localhost:3000/api/repositories/search?q=typescript+react"
+curl "http://138.197.49.129/api/repositories/search?q=typescript+react"
 
 # Get statistics
-curl "http://localhost:3000/api/statistics?topN=10"
+curl "http://138.197.49.129/api/statistics?topN=10"
 ```
 
 ## Tech Stack
@@ -103,10 +103,36 @@ Get up and running in minutes:
    ```
 
 3. **Access the API**
-   - API: `http://localhost:3000`
-   - Swagger Docs: `http://localhost:3000/api/docs`
+   - API: `http://138.197.49.129`
+   - Swagger Docs: `http://138.197.49.129/api/docs`
 
 That's it! The database will be automatically set up and migrations will run.
+
+## Live Demo Deployment
+
+A complete production deployment is available on DigitalOcean Kubernetes at **138.197.49.129**:
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **API** | http://138.197.49.129/ | Main REST API with health endpoints |
+| **Swagger UI** | http://138.197.49.129/api/docs | Interactive API documentation |
+| **Documentation** | http://138.197.49.129/docs | VitePress project documentation |
+| **Grafana** | http://138.197.49.129/grafana/ | Metrics visualization (admin/admin) |
+| **Prometheus** | http://138.197.49.129/prometheus | Metrics collection & query UI |
+| **Kafka UI** | http://138.197.49.129/kafka-ui/ | Kafka topics & cluster management |
+
+### Deployment Features
+
+- **Monitoring Stack**: Prometheus collecting metrics with Grafana displaying 2 dashboards showing live API metrics (request rates, latency, errors)
+- **Message Queue**: Kafka with 5 topics for asynchronous repository sync jobs
+- **Complete Observability**: Full visibility into HTTP requests, latency percentiles (p50, p95, p99), response codes, and business metrics
+- **Production Infrastructure**: Running on DigitalOcean Kubernetes (s-4vcpu-8gb node) with persistent storage and health checks
+
+### Available Metrics
+
+The Grafana dashboards provide real-time monitoring:
+- **API Overview**: HTTP request rates, latency (p95: 9.50ms to 456ms), duration percentiles, response status codes, error rates
+- **Business Metrics**: Repository sync statistics, search queries, GitHub API usage
 
 ## Learn More
 

@@ -38,7 +38,7 @@ PORT=3000
 NODE_ENV=development
 
 # CORS Configuration (comma-separated origins)
-CORS_ORIGINS="http://localhost:3000,http://localhost:5173,http://localhost:8080"
+CORS_ORIGINS="http://138.197.49.129,http://localhost:5173,http://localhost:8080"
 
 # Logging Configuration
 LOG_LEVEL=debug
@@ -103,7 +103,7 @@ Once the application is running, verify it's working:
 ### 1. Check the API
 
 ```bash
-curl http://localhost:3000
+curl http://138.197.49.129
 ```
 
 You should see: `Hello World!`
@@ -113,7 +113,7 @@ You should see: `Hello World!`
 Open your browser and navigate to:
 
 ```
-http://localhost:3000/api/docs
+http://138.197.49.129/api/docs
 ```
 
 You should see the interactive API documentation.
@@ -123,7 +123,7 @@ You should see the interactive API documentation.
 Sync a GitHub user's repositories:
 
 ```bash
-curl -X POST http://localhost:3000/api/repositories/sync/octocat
+curl -X POST http://138.197.49.129/api/repositories/sync/octocat
 ```
 
 You should get a response like:
@@ -140,7 +140,7 @@ You should get a response like:
 
 Now that you have the API running, here's what you can do next:
 
-1. **Explore the API** - Try out different endpoints using the [Swagger UI](http://localhost:3000/api/docs)
+1. **Explore the API** - Try out different endpoints using the [Swagger UI](http://138.197.49.129/api/docs)
 2. **Read the API Reference** - Learn about all available endpoints in the [API Reference](/api/)
 3. **Understand the Architecture** - Dive into the [System Architecture](/architecture)
 4. **Start Development** - Check out the [Development Guide](/development)

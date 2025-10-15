@@ -12,7 +12,7 @@ docker-compose ps
 docker-compose logs --tail=50
 
 # Check API health
-curl http://localhost:3000/api/docs
+curl http://138.197.49.129/api/docs
 
 # Check database connection
 docker-compose exec postgres psql -U postgres -d github_repos -c "SELECT 1"
@@ -425,16 +425,16 @@ docker image prune -a
 1. **Check endpoint exists:**
 ```bash
 # View available routes
-curl http://localhost:3000/api/docs
+curl http://138.197.49.129/api/docs
 ```
 
 2. **Verify base path:**
 ```bash
 # Correct
-curl http://localhost:3000/api/repositories/list/octocat
+curl http://138.197.49.129/api/repositories/list/octocat
 
 # Incorrect (missing /api)
-curl http://localhost:3000/repositories/list/octocat
+curl http://138.197.49.129/repositories/list/octocat
 ```
 
 ---
@@ -454,7 +454,7 @@ curl http://localhost:3000/repositories/list/octocat
 1. **Wait for rate limit reset:**
 ```bash
 # Check retry-after header
-curl -I http://localhost:3000/api/endpoint
+curl -I http://138.197.49.129/api/endpoint
 ```
 
 2. **Adjust rate limits:**
@@ -482,7 +482,7 @@ GITHUB_TOKEN=ghp_your_token_here
 
 ```bash
 # Check response time
-time curl http://localhost:3000/api/repositories/list/octocat
+time curl http://138.197.49.129/api/repositories/list/octocat
 
 # Monitor resources
 docker stats
@@ -579,8 +579,8 @@ curl https://api.github.com/users/username
 2. **Check for typos:**
 ```bash
 # Case-sensitive
-curl http://localhost:3000/api/repositories/sync/OctoCat  # Wrong
-curl http://localhost:3000/api/repositories/sync/octocat  # Correct
+curl http://138.197.49.129/api/repositories/sync/OctoCat  # Wrong
+curl http://138.197.49.129/api/repositories/sync/octocat  # Correct
 ```
 
 ---
@@ -612,14 +612,14 @@ curl https://www.githubstatus.com/api/v2/status.json
 3. **Use cached data:**
 ```bash
 # List cached repositories
-curl http://localhost:3000/api/repositories/list/username
+curl http://138.197.49.129/api/repositories/list/username
 ```
 
 ## CORS Issues
 
 **Error:**
 ```
-Access to fetch at 'http://localhost:3000/api/...' from origin 'http://localhost:5173'
+Access to fetch at 'http://138.197.49.129/api/...' from origin 'http://localhost:5173'
 has been blocked by CORS policy
 ```
 
@@ -628,7 +628,7 @@ has been blocked by CORS policy
 1. **Add origin to whitelist:**
 ```env
 # In .env
-CORS_ORIGINS="http://localhost:3000,http://localhost:5173"
+CORS_ORIGINS="http://138.197.49.129,http://localhost:5173"
 ```
 
 2. **Restart server:**
@@ -640,7 +640,7 @@ docker-compose restart api
 ```bash
 curl -H "Origin: http://localhost:5173" \
   -H "Access-Control-Request-Method: GET" \
-  -I http://localhost:3000/api/repositories/list/octocat
+  -I http://138.197.49.129/api/repositories/list/octocat
 ```
 
 ## Logging Issues

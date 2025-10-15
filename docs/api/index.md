@@ -5,14 +5,14 @@ The GitHub Repository Management API provides RESTful endpoints for synchronizin
 ## Base URL
 
 ```
-http://localhost:3000/api
+http://138.197.49.129/api
 ```
 
 ## Interactive Documentation
 
 For interactive API documentation with the ability to try out endpoints, visit:
 
-**[Swagger UI](http://localhost:3000/api/docs)**
+**[Swagger UI](http://138.197.49.129/api/docs)** (Production) | **[Local](http://138.197.49.129/api/docs)**
 
 ## Authentication
 
@@ -164,7 +164,7 @@ Every request is assigned a unique correlation ID for tracking:
 
 The API supports Cross-Origin Resource Sharing (CORS) for the following origins:
 
-- `http://localhost:3000`
+- `http://138.197.49.129`
 - `http://localhost:5173`
 - `http://localhost:8080`
 
@@ -175,25 +175,25 @@ Additional origins can be configured via the `CORS_ORIGINS` environment variable
 ### Sync Repositories
 
 ```bash
-curl -X POST http://localhost:3000/api/repositories/sync/octocat
+curl -X POST http://138.197.49.129/api/repositories/sync/octocat
 ```
 
 ### List with Pagination
 
 ```bash
-curl "http://localhost:3000/api/repositories/list/octocat?page=1&limit=10"
+curl "http://138.197.49.129/api/repositories/list/octocat?page=1&limit=10"
 ```
 
 ### Search
 
 ```bash
-curl "http://localhost:3000/api/repositories/search?q=typescript+react&page=1"
+curl "http://138.197.49.129/api/repositories/search?q=typescript+react&page=1"
 ```
 
 ### Get Statistics
 
 ```bash
-curl "http://localhost:3000/api/statistics?user=octocat&topN=10"
+curl "http://138.197.49.129/api/statistics?user=octocat&topN=10"
 ```
 
 ## Next Steps

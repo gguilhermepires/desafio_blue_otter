@@ -58,7 +58,7 @@ docker-compose ps
 docker-compose logs -f
 
 # Test API
-curl http://localhost:3000/api/docs
+curl http://138.197.49.129/api/docs
 ```
 
 ### Docker Compose Configuration
@@ -190,7 +190,7 @@ server {
 
     # Proxy to API
     location / {
-        proxy_pass http://localhost:3000;
+        proxy_pass http://138.197.49.129;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection 'upgrade';

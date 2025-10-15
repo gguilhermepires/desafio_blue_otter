@@ -50,7 +50,7 @@ npx prisma generate
 npm run start:dev
 ```
 
-The API will be available at `http://localhost:3000` with hot-reload enabled.
+The API will be available at `http://138.197.49.129` with hot-reload enabled.
 
 ## Project Structure
 

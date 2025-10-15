@@ -1,21 +1,20 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: github-api-ingress
+  name: github-api-ingress-prometheus
   namespace: github-api-dev
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/priority: "100"
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          # API - Root path (MUST be last as it's a catch-all)
-          - path: /()(.*)
+          - path: /prometheus(/.*)?
             pathType: ImplementationSpecific
             backend:
               service:
-                name: api
+                name: prometheus
                 port:
-                  number: 3000
+                  number: 9090

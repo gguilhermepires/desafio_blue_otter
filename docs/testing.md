@@ -597,7 +597,7 @@ seed();
 ```yaml
 # artillery.yml
 config:
-  target: 'http://localhost:3000'
+  target: 'http://138.197.49.129'
   phases:
     - duration: 60
       arrivalRate: 10

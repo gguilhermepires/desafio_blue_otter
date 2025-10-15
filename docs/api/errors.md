@@ -22,7 +22,7 @@ All API errors follow a consistent JSON structure:
 | Field | Type | Description |
 |-------|------|-------------|
 | statusCode | number | HTTP status code |
-| message | string \| string[] | Error message(s) |
+| message | string or string[] | Error message(s) |
 | error | string | Error type/name |
 | timestamp | string | ISO 8601 timestamp |
 | path | string | Request path that caused the error |
@@ -423,6 +423,6 @@ Rate limit information
 ## Next Steps
 
 - [API Reference](/api/)
-- [Repositories API](/api/repositories)
-- [Statistics API](/api/statistics)
-- [Troubleshooting](/troubleshooting)
+- [Repositories API](/api/repositories.html)
+- [Statistics API](/api/statistics.html)
+- [Troubleshooting](/troubleshooting.html)
