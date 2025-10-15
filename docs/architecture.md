@@ -50,7 +50,12 @@ The application follows a **layered architecture** pattern using NestJS modules,
 
 ### Infrastructure
 - **Docker** - Containerization
-- **Docker Compose** - Multi-container orchestration
+- **Docker Compose** - Local development orchestration
+- **Kubernetes** - Production container orchestration (DigitalOcean)
+- **Prometheus** - Metrics collection
+- **Grafana** - Metrics visualization
+- **Kafka** - Message queue for async jobs
+- **Zookeeper** - Kafka coordination
 
 ## Module Structure
 
@@ -235,8 +240,7 @@ model Log {
 - **Caching Strategy** - Local database reduces GitHub API calls
 
 ### Future Enhancements
-- Redis caching for frequently accessed data
-- Background job queue for async operations
+- Response caching for frequently accessed data
 - Read replicas for scaling database reads
 - API response caching with ETags
 
@@ -247,15 +251,28 @@ model Log {
 - Correlation IDs for request tracing
 - Database-persisted logs with 30-day retention
 - Configurable log levels
+- Kubernetes pod logs accessible via kubectl
+
+### Metrics Collection
+- **Prometheus** - Collects metrics from multiple sources:
+  - API application metrics (HTTP requests, latency, errors)
+  - PostgreSQL metrics (connections, queries, performance)
+  - Node metrics (CPU, memory, disk, network)
+  - Kubernetes cluster metrics
+- **Exporters**:
+  - Postgres Exporter - Database-specific metrics
+  - Node Exporter - System-level metrics (DaemonSet on all nodes)
+
+### Visualization
+- **Grafana Dashboards**:
+  - API Overview Dashboard - Request rates, latency percentiles (p50, p95, p99), response codes, error rates
+  - Business Metrics Dashboard - Repository sync stats, search queries, GitHub API usage
+  - Access: http://138.197.49.129/grafana/ (admin/admin)
 
 ### Health Checks
 - PostgreSQL connection health check
-- Docker Compose health monitoring
-
-### Future Monitoring
-- Prometheus metrics export
-- Grafana dashboards
-- APM integration (e.g., New Relic, DataDog)
+- Kubernetes liveness and readiness probes on all pods
+- Service endpoint health monitoring
 
 ## Deployment Architecture
 
@@ -266,16 +283,126 @@ Local Machine
 └── PostgreSQL (Docker)
 ```
 
-### Production
+### Production (Kubernetes)
+
+The production deployment runs on **DigitalOcean Kubernetes** with a comprehensive infrastructure:
+
+```mermaid
+graph TB
+    subgraph Internet
+        Client[Clients]
+    end
+
+    subgraph "DigitalOcean Load Balancer"
+        LB[Load Balancer<br/>138.197.49.129]
+    end
+
+    subgraph "Kubernetes Cluster (github-api-dev namespace)"
+        subgraph "Ingress Layer"
+            Ingress[Nginx Ingress Controller<br/>Path-based routing]
+        end
+
+        subgraph "Application Layer (Deployments)"
+            API[API Service<br/>NestJS + Prisma]
+            Docs[Documentation<br/>VitePress]
+            Grafana[Grafana<br/>Dashboards]
+            KafkaUI[Kafka UI<br/>Management]
+            PGExporter[Postgres Exporter<br/>Metrics]
+        end
+
+        subgraph "Monitoring Layer (StatefulSets)"
+            Prometheus[Prometheus<br/>Metrics Collection<br/>3Gi Storage]
+        end
+
+        subgraph "Message Queue Layer (StatefulSets)"
+            Kafka[Kafka<br/>Message Broker<br/>3Gi Storage]
+            Zookeeper[Zookeeper<br/>Coordination<br/>2Gi Storage]
+        end
+
+        subgraph "Data Layer (StatefulSets)"
+            Postgres[PostgreSQL 16<br/>Primary Database<br/>5Gi Storage]
+        end
+
+        subgraph "Monitoring DaemonSet"
+            NodeExp[Node Exporter<br/>System Metrics<br/>Runs on all nodes]
+        end
+    end
+
+    Client -->|HTTP/HTTPS| LB
+    LB --> Ingress
+
+    Ingress -->|/| API
+    Ingress -->|/docs| Docs
+    Ingress -->|/grafana| Grafana
+    Ingress -->|/prometheus| Prometheus
+    Ingress -->|/kafka-ui| KafkaUI
+    Ingress -->|/api/docs| API
+
+    API -->|Read/Write| Postgres
+    API -->|Publish Jobs| Kafka
+    Kafka -->|Coordination| Zookeeper
+
+    Prometheus -->|Scrape| API
+    Prometheus -->|Scrape| PGExporter
+    Prometheus -->|Scrape| NodeExp
+    PGExporter -->|Query| Postgres
+    Grafana -->|Query| Prometheus
+    KafkaUI -->|Manage| Kafka
+
+    style LB fill:#e1f5ff
+    style Ingress fill:#fff4e6
+    style API fill:#e8f5e9
+    style Postgres fill:#f3e5f5
+    style Kafka fill:#fff3e0
+    style Prometheus fill:#e3f2fd
+    style Grafana fill:#f1f8e9
 ```
-Docker Compose Stack
-├── API Container (NestJS)
-│   ├── Health checks
-│   └── Auto-restart
-└── Database Container (PostgreSQL)
-    ├── Volume persistence
-    └── Automated backups
-```
+
+**Infrastructure Components:**
+
+1. **Ingress Layer**
+   - Nginx Ingress Controller for path-based routing
+   - Single external IP (138.197.49.129)
+   - Routes to multiple backend services
+
+2. **Application Tier** (Deployments - Stateless)
+   - API: NestJS REST API (1 replica, scalable)
+   - Docs: VitePress documentation (1 replica)
+   - Grafana: Metrics visualization (1 replica)
+   - Kafka UI: Message queue management (1 replica)
+   - Postgres Exporter: Database metrics (1 replica)
+
+3. **Monitoring Tier** (StatefulSets - Stateful)
+   - Prometheus: Metrics storage and collection (3Gi persistent volume)
+   - Node Exporter: System metrics (DaemonSet on all nodes)
+
+4. **Message Queue Tier** (StatefulSets - Stateful)
+   - Kafka: Message broker for async jobs (3Gi persistent volume)
+   - Zookeeper: Kafka cluster coordination (2Gi persistent volume)
+
+5. **Data Tier** (StatefulSets - Stateful)
+   - PostgreSQL 16: Primary database (5Gi persistent volume)
+   - Automated backups via CronJobs
+
+**Service Endpoints:**
+- API: http://138.197.49.129/
+- Swagger UI: http://138.197.49.129/api/docs
+- Documentation: http://138.197.49.129/docs
+- Grafana: http://138.197.49.129/grafana/
+- Prometheus: http://138.197.49.129/prometheus
+- Kafka UI: http://138.197.49.129/kafka-ui/
+
+**Storage:**
+- Total: 16Gi persistent storage
+- Storage Class: DigitalOcean Block Storage
+- Backup Strategy: Automated CronJobs for PostgreSQL
+
+**Scaling:**
+- Horizontal Pod Autoscaling configured for API and Docs
+- StatefulSets for data persistence and ordered deployment
+- DaemonSets ensure monitoring on all nodes
+
+For detailed Kubernetes deployment instructions, see [Kubernetes Deployment Guide](/kubernetes-deployment).
 
 ## Design Patterns
 
@@ -304,6 +431,7 @@ See [Testing Guide](/testing) for detailed testing architecture.
 
 ## Next Steps
 
+- [Kubernetes Deployment Guide](/kubernetes-deployment)
 - [Database Schema Details](/database)
 - [Security Guidelines](/security)
 - [Development Guide](/development)

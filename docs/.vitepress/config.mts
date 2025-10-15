@@ -1,9 +1,15 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
-export default defineConfig({
-  title: 'GitHub Repository Management API',
-  description: 'REST API for synchronizing, managing, and analyzing GitHub repositories',
-  base: '/docs/',
+export default withMermaid(
+  defineConfig({
+    title: 'GitHub Repository Management API',
+    description: 'REST API for synchronizing, managing, and analyzing GitHub repositories',
+    base: '/docs/',
+
+    mermaid: {
+      // Mermaid configuration
+    },
 
   themeConfig: {
     nav: [
@@ -52,6 +58,7 @@ export default defineConfig({
         text: 'Deployment',
         items: [
           { text: 'Docker Setup', link: '/deployment' },
+          { text: 'Kubernetes', link: '/kubernetes-deployment' },
           { text: 'Production', link: '/production' },
           { text: 'Troubleshooting', link: '/troubleshooting' }
         ]
@@ -68,3 +75,4 @@ export default defineConfig({
     }
   }
 })
+)

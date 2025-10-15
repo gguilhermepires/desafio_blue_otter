@@ -32,7 +32,7 @@ spec:
         - name: registry-github-api
       containers:
         - name: docs
-          image: registry.digitalocean.com/github-api/github-api-docs:v1.0.5
+          image: registry.digitalocean.com/github-api/github-api-docs:v1.0.10
           ports:
             - containerPort: 5173
               name: http

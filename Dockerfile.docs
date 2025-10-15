@@ -1,16 +1,18 @@
-FROM node:20-alpine
+FROM node:18-alpine
 
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install only production dependencies and vitepress
+RUN npm ci --only=production && npm install vitepress@1.6.4
 
-# Copy docs source
-COPY docs/ ./docs/
+# Copy built documentation
+COPY docs/.vitepress/dist ./docs/.vitepress/dist
 
+# Expose port
 EXPOSE 5173
 
-CMD ["npm", "run", "docs:dev", "--", "--host", "0.0.0.0"]
+# Run preview server
+CMD ["npx", "vitepress", "preview", "docs", "--port", "5173", "--host", "0.0.0.0"]

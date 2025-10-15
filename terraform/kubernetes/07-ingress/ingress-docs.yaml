@@ -6,13 +6,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/priority: "100"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          # Docs - /docs path (no rewrite needed, VitePress handles base path)
-          - path: /docs(/.*)?
+          # Docs - rewrite /docs/* to /* (VitePress serves at root with base: '/docs/')
+          - path: /docs(/|$)(.*)
             pathType: ImplementationSpecific
             backend:
               service:

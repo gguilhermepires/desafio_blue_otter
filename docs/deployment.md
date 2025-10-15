@@ -2,7 +2,27 @@
 
 This guide covers deploying the GitHub Repository Management API to various environments.
 
-## Docker Deployment (Recommended)
+## Deployment Options
+
+Choose the deployment method that best fits your needs:
+
+1. **[Kubernetes (Production)](/kubernetes-deployment)** - Recommended for production deployments with high availability, monitoring, and scalability
+2. **Docker Compose (Development/Small Scale)** - Quick setup for development or small-scale deployments
+3. **Cloud Platforms** - AWS, GCP, DigitalOcean App Platform
+
+::: tip Production Deployment
+For production deployments, we recommend using our **[Kubernetes deployment guide](/kubernetes-deployment)** which includes:
+- High availability with StatefulSets
+- Prometheus + Grafana monitoring
+- Kafka message queue
+- Automated backups
+- Horizontal Pod Autoscaling
+- Complete observability stack
+
+**Live Demo:** http://138.197.49.129 (running on DigitalOcean Kubernetes)
+:::
+
+## Docker Deployment (Development & Small Scale)
 
 ### Prerequisites
 
@@ -311,7 +331,7 @@ For high-traffic scenarios:
 
 - **Connection pooling** - Prisma handles this automatically
 - **Read replicas** - Configure separate read-only database
-- **Caching layer** - Add Redis for frequently accessed data
+- **Database indexing** - Optimize queries with proper indexes
 
 ## Cloud Deployment
 
@@ -384,19 +404,27 @@ gcloud run deploy github-api \
 
 ### Log Aggregation
 
-Recommended tools:
-- **ELK Stack** - Elasticsearch, Logstash, Kibana
-- **Loki** - Lightweight log aggregation
+The application includes built-in database logging:
+- **Database-persisted logs** - All logs stored in PostgreSQL with 30-day retention
+- **Structured JSON format** - Easy to parse and analyze
+- **Correlation IDs** - Track requests across services
+- **Kubernetes logs** - Access via `kubectl logs` command
+
+For cloud deployments, consider:
 - **CloudWatch** - AWS native logging
 - **Stackdriver** - GCP native logging
 
 ### Application Monitoring
 
-Consider integrating:
-- **Prometheus** - Metrics collection
-- **Grafana** - Metrics visualization
-- **New Relic** - APM
-- **DataDog** - Full-stack monitoring
+The project includes a complete monitoring stack:
+- **Prometheus** - Metrics collection (included in Kubernetes deployment)
+- **Grafana** - Metrics visualization with pre-configured dashboards (included in Kubernetes deployment)
+- **Postgres Exporter** - Database metrics
+- **Node Exporter** - System-level metrics
+
+Access the monitoring stack at:
+- Grafana: http://138.197.49.129/grafana/
+- Prometheus: http://138.197.49.129/prometheus
 
 ### Database Monitoring
 
@@ -413,6 +441,7 @@ See [Troubleshooting Guide](/troubleshooting) for common deployment issues.
 
 ## Next Steps
 
+- **[Kubernetes Deployment](/kubernetes-deployment)** - Production-grade deployment guide
 - [Production Checklist](/production)
 - [Security Guidelines](/security)
 - [Troubleshooting](/troubleshooting)

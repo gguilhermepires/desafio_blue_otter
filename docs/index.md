@@ -74,6 +74,9 @@ curl "http://138.197.49.129/api/statistics?topN=10"
 - **Database:** PostgreSQL 16
 - **ORM:** Prisma
 - **Containers:** Docker + Docker Compose
+- **Orchestration:** Kubernetes (DigitalOcean)
+- **Monitoring:** Prometheus + Grafana
+- **Message Queue:** Kafka + Zookeeper
 - **Testing:** Jest + Supertest
 - **Documentation:** Swagger/OpenAPI + VitePress
 
@@ -123,10 +126,14 @@ A complete production deployment is available on DigitalOcean Kubernetes at **13
 
 ### Deployment Features
 
-- **Monitoring Stack**: Prometheus collecting metrics with Grafana displaying 2 dashboards showing live API metrics (request rates, latency, errors)
-- **Message Queue**: Kafka with 5 topics for asynchronous repository sync jobs
-- **Complete Observability**: Full visibility into HTTP requests, latency percentiles (p50, p95, p99), response codes, and business metrics
-- **Production Infrastructure**: Running on DigitalOcean Kubernetes (s-4vcpu-8gb node) with persistent storage and health checks
+- **Kubernetes Infrastructure**: Production-grade deployment on DigitalOcean Kubernetes cluster with s-4vcpu-8gb nodes
+- **High Availability**: StatefulSets for stateful services (Postgres, Kafka, Zookeeper, Prometheus) with persistent storage
+- **Monitoring Stack**: Prometheus collecting metrics from API, Postgres, and nodes; Grafana with 2 custom dashboards showing live API metrics (request rates, latency, errors)
+- **Message Queue**: Kafka cluster with Zookeeper coordination, 5 topics for asynchronous repository sync jobs
+- **Complete Observability**: Full visibility into HTTP requests, latency percentiles (p50, p95, p99), response codes, business metrics, and system metrics
+- **Ingress Controller**: Nginx Ingress routing traffic to multiple services with path-based routing
+- **Persistent Storage**: 16Gi total storage across databases and monitoring systems with automatic backup capabilities
+- **Auto-scaling Ready**: Horizontal Pod Autoscaling configured for API and Docs services
 
 ### Available Metrics
 
@@ -139,5 +146,6 @@ The Grafana dashboards provide real-time monitoring:
 - [Getting Started Guide](/getting-started)
 - [API Reference](/api/)
 - [Architecture Overview](/architecture)
+- [Kubernetes Deployment](/kubernetes-deployment)
 - [Development Guide](/development)
 - [Deployment Instructions](/deployment)
