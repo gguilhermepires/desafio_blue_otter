@@ -40,3 +40,17 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.tfvars
+terraform/kubeconfig-*.yaml
+
+# Kubernetes secrets
+terraform/kubernetes/01-secrets.yaml
+
+# Playwright MCP
+.playwright-mcp/
