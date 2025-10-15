@@ -1,0 +1,10 @@
+# DigitalOcean API Token
+# Get your token from: https://cloud.digitalocean.com/account/api/tokens
+do_token = "your-digitalocean-api-token-here"
+
+# Cluster Configuration
+region           = "nyc1"  # Options: nyc1, nyc3, sfo3, sgp1, lon1, fra1, tor1, blr1
+cluster_name     = "github-api-dev"
+node_size        = "s-2vcpu-4gb"  # $24/month per node
+node_count       = 1
+kubernetes_version = "1.31.1-do.4"  # Check latest: doctl kubernetes options versions

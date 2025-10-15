@@ -33,6 +33,7 @@
     "@nestjs/swagger": "^11.2.0",
     "@nestjs/terminus": "^11.0.0",
     "@nestjs/throttler": "^6.4.0",
+    "@playwright/test": "^1.56.0",
     "@prisma/client": "^6.17.1",
     "@willsoto/nestjs-prometheus": "^6.0.2",
     "axios": "^1.12.2",

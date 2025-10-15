@@ -1,0 +1,91 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  namespace: github-api-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: api
+  ports:
+    - port: 3000
+      targetPort: 3000
+      name: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: github-api-dev
+spec:
+  replicas: 1  # Single replica for 1-node cluster
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      imagePullSecrets:
+        - name: registry-github-api
+      containers:
+        - name: api
+          image: registry.digitalocean.com/github-api/github-api:v1.0.5
+          ports:
+            - containerPort: 3000
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: "3000"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: DATABASE_URL
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: DB_PASSWORD
+            - name: GITHUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: GITHUB_TOKEN
+            - name: KAFKA_BROKER
+              value: "kafka:9092"
+            - name: CORS_ORIGINS
+              value: "http://localhost:3000,http://localhost:5173,http://localhost:8080"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: LOG_RETENTION_DAYS
+              value: "7"  # Reduced for storage
+            - name: THROTTLE_TTL
+              value: "60"
+            - name: THROTTLE_LIMIT
+              value: "100"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "100m"
+              memory: "256Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            failureThreshold: 10

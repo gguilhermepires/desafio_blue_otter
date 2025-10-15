@@ -34,8 +34,15 @@ async function bootstrap() {
   // Get logger service for startup logging
   const logger = app.get(LoggerService);
 
-  // Enable helmet for security headers
-  app.use(helmet());
+  // Enable helmet for security headers (clear HSTS cache and disable CSP for HTTP deployment)
+  app.use(
+    helmet({
+      contentSecurityPolicy: false, // Disable CSP for HTTP deployment with Swagger
+      hsts: {
+        maxAge: 0, // Clear HSTS cache by setting max-age to 0
+      },
+    }),
+  );
 
   // Enable validation pipe globally
   app.useGlobalPipes(

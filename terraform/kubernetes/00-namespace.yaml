@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: github-api-dev
+  labels:
+    name: github-api-dev
+    environment: development

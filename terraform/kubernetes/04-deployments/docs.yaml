@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: docs
+  namespace: github-api-dev
+spec:
+  type: ClusterIP
+  selector:
+    app: docs
+  ports:
+    - port: 5173
+      targetPort: 5173
+      name: http
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docs
+  namespace: github-api-dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docs
+  template:
+    metadata:
+      labels:
+        app: docs
+    spec:
+      imagePullSecrets:
+        - name: registry-github-api
+      containers:
+        - name: docs
+          image: registry.digitalocean.com/github-api/github-api-docs:v1.0.1
+          ports:
+            - containerPort: 5173
+              name: http
+          env:
+            - name: NODE_ENV
+              value: "development"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 60
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 5173
+            initialDelaySeconds: 45
+            periodSeconds: 5

@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: github-api-ingress-swagger
+  namespace: github-api-dev
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/priority: "100"
+    nginx.ingress.kubernetes.io/rewrite-target: /api/docs/$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          # Swagger - /api/docs path with special handling
+          - path: /api/docs(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: api
+                port:
+                  number: 3000

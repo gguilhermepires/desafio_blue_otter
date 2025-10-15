@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: github-api-ingress-docs
+  namespace: github-api-dev
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/priority: "100"
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          # Docs - /docs path (no rewrite needed, VitePress handles base path)
+          - path: /docs(/.*)?
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: docs
+                port:
+                  number: 5173

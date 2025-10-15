@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: 'GitHub Repository Management API',
   description: 'REST API for synchronizing, managing, and analyzing GitHub repositories',
+  base: '/docs/',
 
   themeConfig: {
     nav: [
