@@ -20,15 +20,6 @@ spec:
                 port:
                   number: 9090
 
-          # Kafka UI - /kafka-ui path
-          - path: /kafka-ui(/|$)(.*)
-            pathType: ImplementationSpecific
-            backend:
-              service:
-                name: kafka-ui
-                port:
-                  number: 8080
-
           # API - Root path (MUST be last as it's a catch-all)
           - path: /()(.*)
             pathType: ImplementationSpecific

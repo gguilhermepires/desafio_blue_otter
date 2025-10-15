@@ -41,6 +41,8 @@ spec:
               value: "kafka:9092"
             - name: KAFKA_CLUSTERS_0_ZOOKEEPER
               value: "zookeeper:2181"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: "/kafka-ui"
           resources:
             requests:
               cpu: "100m"
@@ -50,7 +52,7 @@ spec:
               memory: "512Mi"
           livenessProbe:
             httpGet:
-              path: /actuator/health
+              path: /kafka-ui/actuator/health
               port: 8080
             initialDelaySeconds: 60
             periodSeconds: 30
@@ -58,7 +60,7 @@ spec:
             failureThreshold: 5
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /kafka-ui/actuator/health
               port: 8080
             initialDelaySeconds: 30
             periodSeconds: 10
