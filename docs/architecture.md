@@ -409,14 +409,42 @@ For detailed Kubernetes deployment instructions, see [Kubernetes Deployment Guid
 ### Repository Pattern
 Prisma acts as the repository layer, abstracting database operations.
 
+**Why chosen:**
+- **Database abstraction** - Allows switching between different databases without changing business logic
+- **Type safety** - Prisma provides compile-time type checking and auto-completion
+- **Migration management** - Built-in schema versioning and migration tools
+- **Query optimization** - Prisma generates optimized SQL queries automatically
+- **Testability** - Easy to mock database operations in unit tests
+
 ### Service Layer Pattern
 Business logic separated from controllers for testability.
+
+**Why chosen:**
+- **Separation of concerns** - Controllers handle HTTP, services handle business logic
+- **Reusability** - Services can be used by multiple controllers or other services
+- **Testability** - Business logic can be tested independently of HTTP layer
+- **Maintainability** - Changes to business logic don't affect routing or HTTP handling
+- **Single Responsibility** - Each service has a clear, focused purpose
 
 ### Dependency Injection
 NestJS DI container manages all dependencies.
 
+**Why chosen:**
+- **Loose coupling** - Components depend on interfaces, not concrete implementations
+- **Testability** - Easy to inject mock dependencies in tests
+- **Lifecycle management** - NestJS automatically manages object creation and cleanup
+- **Flexibility** - Can easily swap implementations without changing dependent code
+- **Best practice** - Industry-standard pattern for enterprise applications
+
 ### DTO Pattern
 Data Transfer Objects for request/response validation and transformation.
+
+**Why chosen:**
+- **Type safety** - TypeScript interfaces ensure correct data structure
+- **Validation** - Automatic validation with class-validator decorators
+- **Documentation** - DTOs generate Swagger/OpenAPI documentation automatically
+- **API contract** - Clear contract between client and server
+- **Transformation** - Separate internal models from external API representation
 
 ## Error Handling Strategy
 

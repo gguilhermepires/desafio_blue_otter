@@ -59,6 +59,7 @@ export default withMermaid(
         items: [
           { text: 'Docker Setup', link: '/deployment' },
           { text: 'Kubernetes', link: '/kubernetes-deployment' },
+          { text: 'Infrastructure Costs', link: '/costs' },
           { text: 'Production', link: '/production' },
           { text: 'Troubleshooting', link: '/troubleshooting' }
         ]

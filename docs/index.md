@@ -147,5 +147,6 @@ The Grafana dashboards provide real-time monitoring:
 - [API Reference](/api/)
 - [Architecture Overview](/architecture)
 - [Kubernetes Deployment](/kubernetes-deployment)
+- [Infrastructure Costs](/costs)
 - [Development Guide](/development)
 - [Deployment Instructions](/deployment)
