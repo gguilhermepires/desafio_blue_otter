@@ -211,6 +211,52 @@ All stateful components use **DigitalOcean Block Storage** (`do-block-storage`):
 
 **Total Storage:** 15Gi
 
+## Monthly Cost Breakdown
+
+The DigitalOcean Kubernetes deployment has the following monthly costs:
+
+### Infrastructure Costs
+
+| Component | Specification | Monthly Cost |
+|-----------|--------------|--------------|
+| **Kubernetes Node** | s-4vcpu-8gb (4 vCPU, 8GB RAM) × 1 | $48.00 |
+| **Load Balancer** | DigitalOcean Load Balancer | $12.00 |
+| **Block Storage** | 15Gi total | $1.50 |
+| └─ PostgreSQL | 5Gi | $0.50 |
+| └─ Kafka | 3Gi | $0.30 |
+| └─ Zookeeper | 2Gi | $0.20 |
+| └─ Prometheus | 3Gi | $0.30 |
+| └─ Grafana | 2Gi | $0.20 |
+| **Container Registry** | Starter plan | $5.00 |
+| **Total** | | **$66.50/month** |
+
+### Cost Optimization Tips
+
+1. **Development Environment**: Use the s-2vcpu-4gb node ($24/month) to reduce costs by 50% for non-production workloads
+2. **Storage Optimization**:
+   - Reduce Prometheus retention from 1 day to 6 hours: save $0.15/month
+   - Reduce Kafka retention from 24 hours to 12 hours: save $0.15/month
+3. **Registry**: Use the free tier if image storage is under 500MB
+4. **Scheduling**: Use DigitalOcean's scheduled scaling to shut down development clusters during off-hours
+5. **Multi-tenant**: Deploy multiple applications to the same cluster to share infrastructure costs
+
+### Scaling Cost Impact
+
+**Horizontal Pod Scaling** (no additional cost):
+- Scaling API, Docs, Grafana deployments uses existing node resources
+
+**Vertical Node Scaling**:
+- s-2vcpu-4gb: $24/month (development)
+- s-4vcpu-8gb: $48/month (production - current)
+- s-8vcpu-16gb: $96/month (high traffic)
+
+**Multi-Node Cluster**:
+- 2 nodes: $96/month + $12 LB = $108/month
+- 3 nodes: $144/month + $12 LB = $156/month
+
+**Additional Storage**:
+- Each additional 10Gi: $1.00/month
+
 ### Network Configuration
 
 **Cluster Configuration:**
